@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyboard Input</title>
+    <!-- Importing A-Frame library -->
+    <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+    <!-- Importing A-Frame Physics System -->
+    <script src="https://cdn.jsdelivr.net/gh/n5ro/aframe-physics-system@v4.0.1/dist/aframe-physics-system.min.js"></script>
+</head>
+<body>
+    <script>
+        // Defining a custom A-Frame component for handling keyboard input
+        AFRAME.registerComponent('keyboard-input', {
+            init: function() {
+                let el = this.el; // Reference to the entity this component is attached to
+                
+                // Wait until the physics body of the entity is fully loaded
+                el.addEventListener("body-loaded", function() {
+                    // Add a global event listener for keydown events
+                    document.addEventListener('keydown', function(e) {
+                        console.log("%c" + e.key, "font-size:2em"); // Log the pressed key
+
+                        let bola = document.querySelector("#red"); // Select the red sphere
+                        let impulse = new CANNON.Vec3(0, 0, 0); // Initialize impulse vector
+                        let speed = 5; // Define the movement speed
+                        
+                        // Adjust impulse based on the pressed key
+                        if (e.key == "w") {
+                            impulse.z -= speed; // Move forward
+                        }
+                        if (e.key == "a") {
+                            impulse.x -= speed; // Move left
+                        }
+                        if (e.key == "s") {
+                            impulse.z += speed; // Move backward
+                        }
+                        if (e.key == "d") {
+                            impulse.x += speed; // Move right
+                        }
+                        if (e.code == "Space") {
+                            impulse.y += speed; // Move upward (jump)
+                        }
+
+                        // Apply the impulse to the red sphere's physics body
+                        bola.body.applyImpulse(impulse, new CANNON.Vec3(0, 0, 0)); 
+                    });
+                });
+            }
+        })
+    </script>
+
+    <a-scene keyboard-shortcuts="enterVR:false;" physics="debug:true;">
+        <!-- Camera setup with a cursor for interactions -->
+        <a-entity camera position="0 1.5 0">
+            <a-cursor></a-cursor>
+        </a-entity>
+
+        <!-- Floor setup as a static body -->
+        <a-box
+            shadow rotation="-90 0 0"
+            color="#888"
+            static-body
+            width="10"
+            height="10"
+            depth="0.2"
+            position="0 0 -5"
+        ></a-box>
+
+        <!-- Red sphere with dynamic body and keyboard-input component -->
+        <a-sphere
+            keyboard-input
+            id="red"
+            radius="0.2"
+            color="red"
+            shadow
+            dynamic-body
+            position="0 1.5 -3"
+        ></a-sphere>
+
+        <!-- Green cube with a dynamic body -->
+        <a-box
+            id="green"
+            color="green"
+            shadow
+            dynamic-body
+            position="2 1.5 -5"
+        ></a-box>
+
+        <!-- Blue cube with a dynamic body -->
+        <a-box
+            id="blue"
+            color="blue"
+            shadow
+            dynamic-body
+            position="-2 1.5 -5"
+        ></a-box>
+    </a-scene>
+</body>
+</html>

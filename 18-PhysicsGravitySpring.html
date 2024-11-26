@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physics Simulation</title>
+    <!-- Include the A-Frame library for VR/AR scenes -->
+    <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+    <!-- Include the A-Frame physics system for adding physics-based interactions -->
+    <script src="https://cdn.jsdelivr.net/gh/n5ro/aframe-physics-system@v4.0.1/dist/aframe-physics-system.min.js"></script>
+</head>
+<body>
+    <!-- Define a custom component to dynamically generate boxes -->
+    <script>
+        AFRAME.registerComponent('boxgenerator', {
+            init: function() {
+                let el = this.el; // Reference to the element this component is attached to
+                // Add a click event listener to the element
+                el.addEventListener('click', function() {
+                    let scene = document.querySelector("#scene"); // Reference the scene
+                    let newBox = document.createElement("a-box"); // Create a new box element
+                    newBox.setAttribute("scale", "0.2 0.2 0.2"); // Set the scale of the box
+                    newBox.setAttribute("color", "red"); // Set the color of the box
+                    // Generate a random horizontal position for the new box
+                    let temp = Math.random() * 2 - 1;
+                    newBox.setAttribute("position", `${temp} 2 -3`); // Set position above the ground
+                    newBox.setAttribute("dynamic-body", "shape:box"); // Add a dynamic body for physics
+                    newBox.setAttribute("spring", "target:#anchor;stiffness:25"); // Attach the box to the anchor with a spring
+                    scene.appendChild(newBox); // Add the new box to the scene
+                });
+            }
+        });
+    </script>
+
+    <a-scene id="scene" physics="debug:true">
+        <!-- Camera setup to allow user interaction and view -->
+        <a-camera position="0 1.5 2">
+            <a-cursor></a-cursor> <!-- Cursor for selecting objects -->
+        </a-camera>
+        
+        <!-- Anchor box to serve as a static attachment point for springs -->
+        <a-box
+            color="red"
+            id="anchor"
+            scale="0.5 0.5 0.5"
+            static-body 
+            position="0 2.5 -3"
+            wireframe="true" 
+        ></a-box>
+
+        <!-- Yellow box that triggers the generation of new dynamic boxes -->
+        <a-box
+            boxgenerator 
+            color="yellow"
+            scale="0.2 0.2 0.2"
+            position="0 1.5 -3"
+        ></a-box>
+        
+        <!-- Ground plane to act as the floor of the scene -->
+        <a-plane
+            static-body 
+            color="#222"
+            rotation="-90 0 0" 
+            scale="15 15 15" 
+        ></a-plane>
+    </a-scene>
+</body>
+</html>

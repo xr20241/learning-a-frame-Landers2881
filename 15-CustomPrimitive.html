@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Primitive</title>
+    <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+</head>
+<body>
+    <script>
+        // Register a new component called "kotakkosong"
+        AFRAME.registerComponent('kotakkosong', {
+            // Define the schema (data) for the component
+            schema: {
+                ukuran: { type: "number", default: 1 } // 'ukuran' will be the size (number) of the box
+            },
+            tick: function() {
+                // This function is called on every frame to update the object
+                this.kotak.rotation.y += 0.1; // Rotate the box on the Y-axis by 0.1 radians each frame
+            },
+            init: function() {
+                let data = this.data; // Access component data (size of the box)
+                
+                // Create a new material with magenta color and wireframe enabled
+                this.bahan = new THREE.MeshStandardMaterial({
+                    color: 0xff00ff, // Color set to magenta (hex: #ff00ff)
+                    wireframe: true  // Wireframe view enabled for the geometry
+                });
+
+                // Create a box geometry using the size specified in the component data (ukuran)
+                this.geometriKotak = new THREE.BoxGeometry(
+                    data.ukuran, // Box width
+                    data.ukuran, // Box height
+                    data.ukuran, // Box depth
+                    3, 3, 3      // Number of segments in each direction (optional)
+                );
+
+                // Create a mesh using the box geometry and the previously defined material
+                this.kotak = new THREE.Mesh(this.geometriKotak, this.bahan);
+
+                // Create a torus (doughnut) geometry
+                this.geometriDonat = new THREE.TorusBufferGeometry(1.5, 0.2, 45, 45);
+                this.donat = new THREE.Mesh(this.geometriDonat, this.bahan);
+
+                // Create a group to hold both the box and the torus
+                this.kotakdonat = new THREE.Group();
+                this.kotakdonat.add(this.kotak);  // Add the box to the group
+                this.kotakdonat.add(this.donat);  // Add the torus to the group
+
+                // Set the combined group (box + torus) as the 3D object of this entity
+                this.el.setObject3D('mesh', this.kotakdonat);
+            }
+        });
+    </script>
+    <a-scene>
+        <!-- Create an entity with the custom "kotakkosong" component -->
+        <a-entity kotakkosong position="0 1.5 -3"></a-entity>
+    </a-scene>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physics Scripting</title>
+    <!-- Include A-Frame library for creating VR/AR environments -->
+    <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+    <!-- Include the A-Frame physics system for physics-based interactions -->
+    <script src="https://cdn.jsdelivr.net/gh/n5ro/aframe-physics-system@v4.0.1/dist/aframe-physics-system.min.js"></script>
+</head>
+<body>
+    <!-- Define a custom component for applying impulses to objects -->
+    <script>
+        AFRAME.registerComponent("pushableobject", {
+            init: function() {
+                let el = this.el; // Reference to the element this component is attached to
+
+                // Event listener for collision
+                el.addEventListener("collide", function(ev) {
+                    // Logs the ID of the colliding object
+                    console.log("%c" + ev.srcElement.id, "font-size:2em");
+                });
+
+                // Event listener for user clicks
+                el.addEventListener("click", function() {
+                    // Get the position of the object being clicked
+                    let positionObject = el.getAttribute("position");
+                    let positionVector = new THREE.Vector3(positionObject.x, positionObject.y, positionObject.z);
+                    
+                    // Get the position of the camera
+                    let camPosObject = document.querySelector("#cam").getAttribute("position");
+                    let camPosVector = new THREE.Vector3(camPosObject.x, camPosObject.y, camPosObject.z);
+                    
+                    // Calculate direction from the object to the camera
+                    let direction = camPosVector.sub(positionVector);
+                    direction = direction.normalize(); // Normalize to a unit vector
+                    let speed = -10; // Negative speed to push away from the camera
+                    direction = direction.multiplyScalar(speed); // Scale by speed
+                    
+                    // Apply impulse using Cannon.js
+                    el.body.applyImpulse(
+                        new CANNON.Vec3(direction.x, 0, direction.z), // Impulse direction
+                        new CANNON.Vec3().copy(positionVector) // Apply force at the current position
+                    );
+                });
+            }
+        });
+    </script>
+
+    <a-scene physics="debug:true">
+        <!-- Camera for user's point of view -->
+        <a-camera id="cam">
+            <a-cursor></a-cursor> <!-- Cursor to interact with objects -->
+        </a-camera>
+
+        <!-- Static ground plane -->
+        <a-box
+            shadow
+            rotation="-90 0 0" 
+            color="#888" 
+            static-body 
+            width="10"
+            height="10"
+            depth="0.2"
+            position="0 0 -5"
+        ></a-box>
+
+        <!-- Red sphere with a dynamic body and mass of 5 -->
+        <a-sphere 
+            id="merah" 
+            pushableobject 
+            radius="0.2" 
+            color="red" 
+            shadow 
+            dynamic-body="mass:5;" 
+            position="0 1.5 -3"
+        ></a-sphere>
+
+        <!-- Green sphere with a dynamic body and mass of 50 -->
+        <a-sphere 
+            id="hijau" 
+            pushableobject
+            radius="0.2" 
+            color="green" 
+            shadow 
+            dynamic-body="mass:50;" 
+            position="2 1.5 -5"
+        ></a-sphere>
+
+        <!-- Blue sphere with a dynamic body and mass of 500 -->
+        <a-sphere 
+            id="biru" 
+            pushableobject
+            radius="0.2" 
+            color="blue" 
+            shadow 
+            dynamic-body="mass:500;"
+            position="-2 1.5 -5"
+        ></a-sphere>
+    </a-scene>
+</body>
+</html>

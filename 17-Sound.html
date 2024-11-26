@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Character encoding set to UTF-8 for international support -->
+    <meta charset="UTF-8">
+    <!-- Viewport settings to ensure responsive design on mobile devices -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sound</title>
+
+    <!-- Including the A-Frame library for creating WebVR experiences -->
+    <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+    <!-- Including the A-Frame extras library for additional components -->
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+</head>
+<body>
+
+    <!-- JavaScript code to control sound based on user interaction -->
+    <script>
+        AFRAME.registerComponent('soundcontroller', {
+            init:function() {
+                let el = this.el;  // Get the current element the component is attached to
+                el.addEventListener('click', function(ev) {  // Add a click event listener
+                    let id = ev.srcElement.id;  // Get the ID of the clicked element
+                    console.log(`%c${id}`,"font-size:2em;");  // Log the ID to the console in large font
+                    let speaker = document.querySelector("#speaker");  // Get the speaker element
+                    if (id == "play") {
+                        speaker.components.sound.playSound();  // Play sound if the 'play' button is clicked
+                    } else if (id == "pause") {
+                        speaker.components.sound.pauseSound();  // Pause sound if the 'pause' button is clicked
+                    } else {
+                        speaker.components.sound.stopSound();  // Stop sound if the 'stop' button is clicked
+                    }
+                });
+            }
+        });
+    </script>
+
+    <!-- A-Frame scene to set up the 3D environment -->
+    <a-scene>
+        <!-- Camera setup with a cursor that interacts with objects -->
+        <a-camera>
+            <a-cursor raycaster="objects:a-box"></a-cursor> <!-- Cursor interacts with a-box elements -->
+        </a-camera>
+        
+        <!-- Sky background with a light blue color -->
+        <a-sky color="lightblue"></a-sky>
+        
+        <!-- Ocean element with specified width, depth, and density -->
+        <a-ocean width="100" depth="100" density="40"></a-ocean>
+        
+        <!-- 3D model of an island, loaded from a .gltf file -->
+        <a-gltf-model
+            src="models/Island.gltf"
+            gltf-model="models/Island.gltf"
+            scale="0.1 0.1 0.1"
+            rotation="0 150 0"
+            position="0 0 -3"
+        ></a-gltf-model>
+
+        <!-- Speaker box with sound component attached, but sound is not autoplayed -->
+        <a-box id="speaker" color="#F00" position="0 1.5 -3"
+            sound="src:audios/Cartoon.wav;autoplay:false;"
+        ></a-box>
+        
+        <!-- Play, Pause, and Stop buttons as interactive boxes with soundcontroller component -->
+        <a-box soundcontroller id="play" color="#500" position="0 1 -2" scale="0.5 0.5 0.5"></a-box>
+        <a-box soundcontroller id="pause" color="#550" position="1.5 1 -2" scale="0.5 0.5 0.5"></a-box>
+        <a-box soundcontroller id="stop" color="#050" position="-1.5 1 -2" scale="0.5 0.5 0.5"></a-box>
+    </a-scene>
+</body>
+</html>
